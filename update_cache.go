@@ -1,7 +1,6 @@
 package main
 
 import (
-    "bufio"
     "bytes"
     "encoding/gob"
     "encoding/xml"
@@ -38,8 +37,9 @@ type Link struct {
     Notes   string    `xml:"extended,attr"`
     Time    time.Time `xml:"time,attr"`
     Hash    string    `xml:"hash,attr"`
-    Shared  bool      `xml:"shared,attr"`
-    Tags    string    `xml:"tag,attr"`
+    Shared  bool      `xml:"-"`
+     SharedString  string      `xml:"shared,attr"`
+   Tags    string    `xml:"tag,attr"`
     Meta    string    `xml:"meta,attr"`
 }
 
@@ -131,13 +131,17 @@ func readPostsCache(ga *Alfred.GoAlfred) (posts *Posts, err error) {
     if err != nil {
         return nil, err
     }
-    rd := strings.NewReader(string(result))
-    brd := bufio.NewReaderSize(rd, rd.Len())
-    p := make([]byte, rd.Len())
-    brd.Read(p)
-    if err = xml.Unmarshal(p, posts); err != nil {
+    if err = xml.Unmarshal(result, posts); err != nil {
         return nil, err
     }
+
+	for _, p := range posts.Pins {
+		p.Shared = false
+		if p.SharedString == "yes" {
+			p.Shared = true
+		}
+	}
+
     return posts, nil
 }
 
