@@ -11,7 +11,7 @@ import (
     "strings"
 
     Alfred "bitbucket.org/listboss/go-alfred"
-    cli "github.com/codegangsta/cli"
+    cli "github.com/urfave/cli"
 )
 
 var (
